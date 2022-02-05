@@ -35,6 +35,18 @@
 #define SC_ThreadExit   14
 #define SC_ThreadJoin   15
 
+#define SC_ReadNum 16
+#define SC_PrintNum 17
+#define SC_ReadChar 18
+#define SC_PrintChar 19
+#define SC_RandomNum 20
+#define SC_ReadString 21
+#define SC_PrintString 22
+#define SC_Help 23
+#define SC_Ascii 24
+#define SC_Sort 25
+
+
 #define SC_Add		42
 
 #ifndef IN_ASM
@@ -51,7 +63,11 @@
 
 /* Stop Nachos, and print out performance stats */
 void Halt();		
- 
+
+/*
+* Read Int
+*/ 
+int ReadNum();
  
 /*
  * Add the two operants and return the result

@@ -90,9 +90,7 @@ void ExceptionHandler(ExceptionType which)
 
 			DEBUG(dbgSys, "Add returning with " << result << "\n");
 			/* Prepare Result */
-			kernel->machine->WriteRegister(2, (int)result);
-
-			
+			kernel->machine->WriteRegister(2, (int)result);	
 
 			return;
 
@@ -104,6 +102,7 @@ void ExceptionHandler(ExceptionType which)
 			cerr << "Unexpected system call " << type << "\n";
 			break;
 		}
+		IncrementPC();
 		break;
 	case NoException:
 		DEBUG(dbgSynch, "No Exception.\n");
