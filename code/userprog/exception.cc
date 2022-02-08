@@ -25,6 +25,8 @@
 #include "main.h"
 #include "syscall.h"
 #include "ksyscall.h"
+
+#include "synchconsole.h"
 //----------------------------------------------------------------------
 // ExceptionHandler
 // 	Entry point into the Nachos kernel.  Called when a user program
@@ -61,6 +63,45 @@ void IncrementPC()
 		kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
 	}
 }
+
+char *User2System(int virtAddr, int limit)
+{
+	int i; // chi so index
+	int oneChar;
+	char *kernelBuf = NULL;
+	kernelBuf = new char[limit + 1]; // can cho chuoi terminal
+	if (kernelBuf == NULL)
+		return kernelBuf;
+
+	memset(kernelBuf, 0, limit + 1);
+
+	for (i = 0; i < limit; i++)
+	{
+		kernel->machine->ReadMem(virtAddr + i, 1, &oneChar);
+		kernelBuf[i] = (char)oneChar;
+		if (oneChar == 0)
+			break;
+	}
+	return kernelBuf;
+}
+
+int System2User(int virtAddr, int len, char *buffer)
+{
+	if (len < 0)
+		return -1;
+	if (len == 0)
+		return len;
+	int i = 0;
+	int oneChar = 0;
+	do
+	{
+		oneChar = (int)buffer[i];
+		kernel->machine->WriteMem(virtAddr + i, 1, oneChar);
+		i++;
+	} while (i < len && oneChar != 0);
+	return i;
+}
+
 void ExceptionHandler(ExceptionType which)
 {
 	int type = kernel->machine->ReadRegister(2);
@@ -90,24 +131,142 @@ void ExceptionHandler(ExceptionType which)
 
 			DEBUG(dbgSys, "Add returning with " << result << "\n");
 			/* Prepare Result */
-			kernel->machine->WriteRegister(2, (int)result);	
+			kernel->machine->WriteRegister(2, (int)result);
 
+			IncrementPC();
 			return;
-
 			ASSERTNOTREACHED();
 
 			break;
+
+		case SC_ReadNum:
+		{
+			int MAX_LENGTH_INT = 11;
+			int num = 0;
+			bool valid = true;
+			char* buffer = new char [MAX_LENGTH_INT+1];
+			int index = 0;
+			buffer[index] = kernel->synchConsoleIn->GetChar();
+			int currentIndex = 0;
+			if (buffer[index] == '-') {
+				currentIndex = 1;
+			}
+
+			while (buffer[index] != '\n') {
+				if (buffer[index] < '0' || buffer[index] > '9') {
+					if (!(index == 0 && currentIndex == 1)){
+						DEBUG(dbgSys, "Invalid character" << "\n");
+						valid = false;
+						break;						
+					}
+				}
+				index++;
+				buffer[index] = kernel->synchConsoleIn->GetChar();
+			}
+			if (index > MAX_LENGTH_INT) {
+				valid = false;
+				DEBUG(dbgSys, "Over size of integer");
+			}
+			if (valid) {
+				for (int i = currentIndex; i < index; i++) {
+					num = num * 10 + (int)(buffer[i] - 48);
+				}
+			}
+			if (currentIndex == 1) num*=-1;
+
+			DEBUG(dbgSys, "Result: " << num << "\n");
+
+
+			kernel->machine->WriteRegister(2, num);
+			IncrementPC();
+			delete buffer;
+			return;
+			ASSERTNOTREACHED();
+			break;
+		}
+		case SC_PrintNum:
+		{
+			// kernel->synchConsoleOut->PutChar('a');
+			int res = kernel->machine->ReadRegister(4);
+
+			if (res == 0) {
+				kernel->synchConsoleOut->PutChar('0');
+				IncrementPC();
+				return;
+			}
+			
+			char * buffer = new char [12];
+			
+			int currentIndex = 0;
+			
+			int tmp = res;
+			int countDigit = 0;
+
+			while (tmp) {
+				tmp /= 10;
+				countDigit++;
+			}
+			if (res < 0) {
+				buffer[countDigit] = '-';
+				tmp = -res;
+			}else{
+				countDigit--;
+				tmp = res;
+			}
+			
+			while (tmp) {
+				buffer[currentIndex] = (char)((tmp % 10) + 48);	
+				currentIndex++;
+				tmp/=10;
+			}
+			for (int i = countDigit; i >=0; i--) {
+				kernel->synchConsoleOut->PutChar(buffer[i]);
+			}
+			kernel->synchConsoleOut->PutChar('\n');
+			
+			delete buffer;
+			IncrementPC();
+			return;
+			ASSERTNOTREACHED();
+			break;
+		}
+
+		case SC_ReadChar:
+		{
+			char tmp = kernel->synchConsoleIn->GetChar();
+	
+			kernel->machine->WriteRegister(2, tmp);
+
+			IncrementPC();
+			return;
+			ASSERTNOTREACHED();
+			break;
+		}
+
+		case SC_PrintChar:
+		{
+			char res = (char)(kernel->machine->ReadRegister(4));
+
+			kernel->synchConsoleOut->PutChar(res);
+
+			kernel->synchConsoleOut->PutChar('\n');
+
+			IncrementPC();
+			return;
+			ASSERTNOTREACHED();
+			break;
+		}
 
 		default:
 			cerr << "Unexpected system call " << type << "\n";
 			break;
 		}
-		IncrementPC();
+
 		break;
 	case NoException:
 		DEBUG(dbgSynch, "No Exception.\n");
 		SysHalt();
-		return;
+		break;
 	case PageFaultException:
 		DEBUG(dbgSynch, "Page Fault Exception.\n");
 		SysHalt();

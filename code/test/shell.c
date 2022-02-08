@@ -1,11 +1,11 @@
-#include "syscall.h"
+#include "../userprog/syscall.h"
 
 int
 main()
 {
     SpaceId newProc;
-    OpenFileId input = ConsoleInput;
-    OpenFileId output = ConsoleOutput;
+    OpenFileId input = ConsoleInputt;
+    OpenFileId output = ConsoleOutputt;
     char prompt[2], ch, buffer[60];
     int i;
 

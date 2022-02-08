@@ -13,9 +13,6 @@
 
 #include "kernel.h"
 
-
-
-
 void SysHalt()
 {
   kernel->interrupt->Halt();
@@ -27,7 +24,10 @@ int SysAdd(int op1, int op2)
   return op1 + op2;
 }
 
-
+// int SysReadNum(){
+//   // char a = kernel->synchConsoleIn->GetChar();
+//   return 0;
+// }
 
 
 

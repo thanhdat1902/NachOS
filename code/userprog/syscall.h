@@ -64,11 +64,24 @@
 /* Stop Nachos, and print out performance stats */
 void Halt();		
 
-/*
-* Read Int
-*/ 
+/* Read number*/
 int ReadNum();
- 
+
+/*
+ * Print number
+ */
+void PrintNum(int num);
+
+/*
+ * Read character
+ */
+char ReadChar();
+
+/*
+ * Print character
+ */
+void PrintChar(char character);
+
 /*
  * Add the two operants and return the result
  */ 
@@ -121,8 +134,8 @@ typedef int OpenFileId;
  * the console device.
  */
 
-#define ConsoleInput	0  
-#define ConsoleOutput	1  
+#define ConsoleInputt	0  
+#define ConsoleOutputt	1  
  
 /* Create a Nachos file, with name "name" */
 /* Note: Create does not open the file.   */
