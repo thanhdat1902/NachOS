@@ -82,6 +82,9 @@ char ReadChar();
  */
 void PrintChar(char character);
 
+void ReadString(char buffer[], int length);
+
+void PrintString(char buffer[]);
 /*
  * Add the two operants and return the result
  */ 

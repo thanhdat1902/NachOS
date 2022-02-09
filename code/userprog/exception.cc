@@ -184,6 +184,7 @@ void ExceptionHandler(ExceptionType which)
 			ASSERTNOTREACHED();
 			break;
 		}
+
 		case SC_PrintNum:
 		{
 			// kernel->synchConsoleOut->PutChar('a');
@@ -250,6 +251,56 @@ void ExceptionHandler(ExceptionType which)
 			kernel->synchConsoleOut->PutChar(res);
 
 			kernel->synchConsoleOut->PutChar('\n');
+
+			IncrementPC();
+			return;
+			ASSERTNOTREACHED();
+			break;
+		}
+
+		case SC_ReadString:
+		{
+			int addressBuffer = kernel->machine->ReadRegister(4);
+			int length = kernel->machine->ReadRegister(5);
+
+			int index = 0;
+			int tmp = length;
+			char * buffer = User2System(addressBuffer, length);
+
+			while (tmp) {
+				buffer[index] = kernel->synchConsoleIn->GetChar();
+				if (buffer[index] == '\n') break;
+				index++;
+				tmp--;
+			}
+			
+			System2User(addressBuffer, length, buffer);
+			
+			delete buffer;
+
+			IncrementPC();
+			return;
+			ASSERTNOTREACHED();
+			break;
+		}
+
+		case SC_PrintString:
+		{
+			int MAX_LENGTH_STRING = 1000;
+			int addressBuffer = kernel->machine->ReadRegister(4);
+
+			char * buffer = User2System(addressBuffer, MAX_LENGTH_STRING);
+
+			int index = 0;
+			while (buffer[index] != '\0') {
+				index++;
+			}
+
+			for (int i = 0; i < index; i++) {
+				kernel->synchConsoleOut->PutChar(buffer[i]);
+			}
+
+			delete buffer;
 
 			IncrementPC();
 			return;
