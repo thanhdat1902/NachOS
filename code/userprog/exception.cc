@@ -223,7 +223,7 @@ void ExceptionHandler(ExceptionType which)
 			for (int i = countDigit; i >=0; i--) {
 				kernel->synchConsoleOut->PutChar(buffer[i]);
 			}
-			kernel->synchConsoleOut->PutChar('\n');
+			// kernel->synchConsoleOut->PutChar('\n');
 			
 			delete buffer;
 			IncrementPC();
@@ -250,7 +250,7 @@ void ExceptionHandler(ExceptionType which)
 
 			kernel->synchConsoleOut->PutChar(res);
 
-			kernel->synchConsoleOut->PutChar('\n');
+			// kernel->synchConsoleOut->PutChar('\n');
 
 			IncrementPC();
 			return;
