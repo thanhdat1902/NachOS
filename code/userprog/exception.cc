@@ -336,35 +336,35 @@ void ExceptionHandler(ExceptionType which)
 
 		break;
 	case NoException:
-		DEBUG(dbgSynch, "No Exception.\n");
+		DEBUG(dbgSys, "No Exception.\n");
 		SysHalt();
 		break;
 	case PageFaultException:
-		DEBUG(dbgSynch, "Page Fault Exception.\n");
+		DEBUG(dbgSys, "Page Fault Exception.\n");
 		SysHalt();
 		break;
 	case ReadOnlyException:
-		DEBUG(dbgSynch, "Read Only Exception.\n");
+		DEBUG(dbgSys, "Read Only Exception.\n");
 		SysHalt();
 		break;
 	case BusErrorException:
-		DEBUG(dbgSynch, "Bus Error Exception.\n");
+		DEBUG(dbgSys, "Bus Error Exception.\n");
 		SysHalt();
 		break;
 	case AddressErrorException:
-		DEBUG(dbgSynch, "Address Error Exception.\n");
+		DEBUG(dbgSys, "Address Error Exception.\n");
 		SysHalt();
 		break;
 	case OverflowException:
-		DEBUG(dbgSynch, "Overflow Exception.\n");
+		DEBUG(dbgSys, "Overflow Exception.\n");
 		SysHalt();
 		break;
 	case IllegalInstrException:
-		DEBUG(dbgSynch, "Illegal Instr Exception.\n");
+		DEBUG(dbgSys, "Illegal Instr Exception.\n");
 		SysHalt();
 		break;
 	case NumExceptionTypes:
-		DEBUG(dbgSynch, "Num ExceptionType Exception.\n");
+		DEBUG(dbgSys, "Num ExceptionType Exception.\n");
 		SysHalt();
 		break;
 	default:
