@@ -27,6 +27,8 @@
 #include "ksyscall.h"
 
 #include "synchconsole.h"
+#include <stdlib.h>
+#include <time.h>
 //----------------------------------------------------------------------
 // ExceptionHandler
 // 	Entry point into the Nachos kernel.  Called when a user program
@@ -233,15 +235,15 @@ void ExceptionHandler(ExceptionType which)
 		case SC_ReadChar:
 		{
 			int MAX_BUFFER = 256;
-			char * input  = new char [256+1];
+			char * input  = new char [MAX_BUFFER+1];
 			int index = -1;
 
 			do {
 				input[++index] = kernel->synchConsoleIn->GetChar();	
 			}
-			while (input[index] != '\n');
+			while (input[index] != '\n' && index <= MAX_BUFFER);
 
-			if (index > 0) {
+			if (index > 1) {
 				DEBUG(dbgSys, "Not a single character \n");
 			}
 
@@ -269,9 +271,15 @@ void ExceptionHandler(ExceptionType which)
 
 		case SC_RandomNum:
 		{
-			int res = rand();
+			int i, stime;
+			long ltime;
 
-			kernel->machine->WriteRegister(2, res);
+			/* get the current calendar time */
+			ltime = time(NULL);
+			stime = (unsigned) ltime/2;
+			srand(stime);
+			
+			kernel->machine->WriteRegister(2, rand());
 
 			IncrementPC();
 			return;
