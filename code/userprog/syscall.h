@@ -64,26 +64,37 @@
 /* Stop Nachos, and print out performance stats */
 void Halt();		
 
-/* Read number*/
+/* Read an integer number*/
 int ReadNum();
 
 /*
- * Print number
+ * Print an integer number
  */
 void PrintNum(int num);
 
 /*
- * Read character
+ * Read a character
  */
 char ReadChar();
 
 /*
- * Print character
+ * Print single character
  */
 void PrintChar(char character);
 
+/*
+ * Create an random number
+ */
+int RandomNum();
+
+/*
+ * Read the string
+ */
 void ReadString(char buffer[], int length);
 
+/*
+ * Print the string
+ */
 void PrintString(char buffer[]);
 /*
  * Add the two operants and return the result

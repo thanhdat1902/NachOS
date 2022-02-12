@@ -187,7 +187,6 @@ void ExceptionHandler(ExceptionType which)
 
 		case SC_PrintNum:
 		{
-			// kernel->synchConsoleOut->PutChar('a');
 			int res = kernel->machine->ReadRegister(4);
 
 			if (res == 0) {
@@ -223,7 +222,6 @@ void ExceptionHandler(ExceptionType which)
 			for (int i = countDigit; i >=0; i--) {
 				kernel->synchConsoleOut->PutChar(buffer[i]);
 			}
-			// kernel->synchConsoleOut->PutChar('\n');
 			
 			delete buffer;
 			IncrementPC();
@@ -234,9 +232,20 @@ void ExceptionHandler(ExceptionType which)
 
 		case SC_ReadChar:
 		{
-			char tmp = kernel->synchConsoleIn->GetChar();
-	
-			kernel->machine->WriteRegister(2, tmp);
+			int MAX_BUFFER = 256;
+			char * input  = new char [256+1];
+			int index = -1;
+
+			do {
+				input[++index] = kernel->synchConsoleIn->GetChar();	
+			}
+			while (input[index] != '\n');
+
+			if (index > 0) {
+				DEBUG(dbgSys, "Not a single character \n");
+			}
+
+			kernel->machine->WriteRegister(2, input[0]);
 
 			IncrementPC();
 			return;
@@ -251,6 +260,18 @@ void ExceptionHandler(ExceptionType which)
 			kernel->synchConsoleOut->PutChar(res);
 
 			// kernel->synchConsoleOut->PutChar('\n');
+
+			IncrementPC();
+			return;
+			ASSERTNOTREACHED();
+			break;
+		}
+
+		case SC_RandomNum:
+		{
+			int res = rand();
+
+			kernel->machine->WriteRegister(2, res);
 
 			IncrementPC();
 			return;
