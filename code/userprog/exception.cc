@@ -116,14 +116,17 @@ void ExceptionHandler(ExceptionType which)
 		switch (type)
 		{
 		case SC_Halt:
+		{
 			DEBUG(dbgSys, "Shutdown, initiated by user program.\n");
 
 			SysHalt();
 
 			ASSERTNOTREACHED();
 			break;
-
+		}
+			
 		case SC_Add:
+		{
 			DEBUG(dbgSys, "Add " << kernel->machine->ReadRegister(4) << " + " << kernel->machine->ReadRegister(5) << "\n");
 
 			/* Process SysAdd Systemcall*/
@@ -140,6 +143,7 @@ void ExceptionHandler(ExceptionType which)
 			ASSERTNOTREACHED();
 
 			break;
+		}
 
 		case SC_ReadNum:
 		{
