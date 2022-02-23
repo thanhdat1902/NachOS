@@ -148,11 +148,13 @@ void ExceptionHandler(ExceptionType which)
 		case SC_ReadNum:
 		{
 			int MAX_LENGTH_INT = 11;
-			int num = 0;
-			bool valid = true;
+			long long MAX_INT = 2147483647;
+			long long MIN_INT = -2147483648;
+			long long num = 0;
 			char* buffer = new char [MAX_LENGTH_INT+1];
 			int index = 0;
 			buffer[index] = kernel->synchConsoleIn->GetChar();
+			bool valid = true;
 			int currentIndex = 0;
 			if (buffer[index] == '-') {
 				currentIndex = 1;
@@ -169,16 +171,19 @@ void ExceptionHandler(ExceptionType which)
 				index++;
 				buffer[index] = kernel->synchConsoleIn->GetChar();
 			}
-			if (index > MAX_LENGTH_INT) {
-				valid = false;
-				DEBUG(dbgSys, "Over size of integer");
-			}
+			
 			if (valid) {
 				for (int i = currentIndex; i < index; i++) {
 					num = num * 10 + (int)(buffer[i] - 48);
 				}
 			}
+
 			if (currentIndex == 1) num*=-1;
+
+			if (num > MAX_INT || num < MIN_INT || index > MAX_LENGTH_INT) {
+				valid = false;
+				DEBUG(dbgSys, "Over size of integer");
+			}
 
 			DEBUG(dbgSys, "Result: " << num << "\n");
 
