@@ -147,45 +147,45 @@ void ExceptionHandler(ExceptionType which)
 
 		case SC_ReadNum:
 		{
-			int MAX_LENGTH_INT = 11;
-			long long MAX_INT = 2147483647;
-			long long MIN_INT = -2147483648;
-			long long num = 0;
-			char* buffer = new char [MAX_LENGTH_INT+1];
-			int index = 0;
+			int MAX_LENGTH_INT = 11;		// Max length of int32 digits
+			long long MAX_INT = 2147483647; 	// 2^31 - 1
+			long long MIN_INT = -2147483648;	// -2^31
+			long long num = 0;		// the final number 
+			char* buffer = new char [MAX_LENGTH_INT+1];		// buffer of input digit
+			int index = 0;		// length of digits of number
 			buffer[index] = kernel->synchConsoleIn->GetChar();
 			bool valid = true;
-			int currentIndex = 0;
-			if (buffer[index] == '-') {
+			int currentIndex = 0;		// interator of input
+			if (buffer[index] == '-') {		//when the first digit is "-" -> it will be negative number
 				currentIndex = 1;
 			}
 
-			while (buffer[index] != '\n') {
-				if (buffer[index] < '0' || buffer[index] > '9') {
-					if (!(index == 0 && currentIndex == 1)){
+			while (buffer[index] != '\n') {			// while not end of line
+				if (buffer[index] < '0' || buffer[index] > '9') {		// is not number digit
+					if (!(index == 0 && currentIndex == 1)){			
 						DEBUG(dbgSys, "Invalid character" << "\n");
 						valid = false;
 						break;						
 					}
 				}
-				index++;
-				buffer[index] = kernel->synchConsoleIn->GetChar();
+				index++;		// increase length
+				buffer[index] = kernel->synchConsoleIn->GetChar();		// input digit from character
 			}
 			
-			if (valid) {
-				for (int i = currentIndex; i < index; i++) {
+			if (valid) {			// if the string is valid (can transform into number)
+				for (int i = currentIndex; i < index; i++) {		// then convert it to number
 					num = num * 10 + (int)(buffer[i] - 48);
 				}
 			}
 
-			if (currentIndex == 1) num*=-1;
+			if (currentIndex == 1) num*=-1;		// if negative, add "-" for number
 
-			if (num > MAX_INT || num < MIN_INT || index > MAX_LENGTH_INT) {
+			if (num > MAX_INT || num < MIN_INT || index > MAX_LENGTH_INT) {		// if this number is outOfBound of int32 number
 				valid = false;
 				DEBUG(dbgSys, "Over size of integer");
 			}
 
-			DEBUG(dbgSys, "Result: " << num << "\n");
+			DEBUG(dbgSys, "Result: " << num << "\n");		// print result
 
 
 			kernel->machine->WriteRegister(2, num);
