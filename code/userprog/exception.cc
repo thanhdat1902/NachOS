@@ -147,51 +147,47 @@ void ExceptionHandler(ExceptionType which)
 
 		case SC_ReadNum:
 		{
-			int MAX_LENGTH_INT = 11;		// Max length of int32 digits
-			long long MAX_INT = 2147483647; 	// 2^31 - 1
-			long long MIN_INT = -2147483648;	// -2^31
-			long long num = 3000000000;		// the final number
+			int MAX_LENGTH_INT = 11;
+			char* buffer = new char [MAX_LENGTH_INT+1];
+			int currentLength = 0;
 
-			DEBUG(dbgSys, "This is num" << num << "\n");
+			int MAX_INT = 2147483647; 	// 2^31 - 1
+			int MIN_INT = -2147483648;	// -2^31
 
-			char* buffer = new char [MAX_LENGTH_INT+1];		// buffer of input digit
-			int index = 0;		// length of digits of number
-			buffer[index] = kernel->synchConsoleIn->GetChar();
-			bool valid = true;
-			int currentIndex = 0;		// interator of input
-			if (buffer[index] == '-') {		//when the first digit is "-" -> it will be negative number
-				currentIndex = 1;
-			}
+			bool isNegative = false;
 
-			while (buffer[index] != '\n') {			// while not end of line
-				if (buffer[index] < '0' || buffer[index] > '9') {		// is not number digit
-					if (!(index == 0 && currentIndex == 1)){
-						DEBUG(dbgSys, "Invalid character" << "\n");
-						valid = false;
-						break;
-					}
+			while (true) {
+				char currentDigit = kernel->synchConsoleIn->GetChar();		// input character from console
+
+				bool isValidMinus = (currentDigit == '-' && currentLength == 0);
+				bool isValidDigit = ('0' <= currentDigit && currentDigit <= '9');
+
+
+				if (isValidDigit || isValidMinus) {
+					buffer[currentLength++] = currentDigit;
+				} else {
+					// break if there is invalid character (or '\n')
+					break;
 				}
-				index++;		// increase length
-				buffer[index] = kernel->synchConsoleIn->GetChar();		// input digit from character
+				isNegative = isNegative || isValidMinus;
 			}
 
-			if (valid) {			// if the string is valid (can transform into number)
-				for (int i = currentIndex; i < index; i++) {		// then convert it to number
-					num = num * 10 + (int)(buffer[i] - 48);
-				}
+
+			long long convertedValue = 0;
+			for (int i = isNegative ? 1 : 0; i < currentLength; i++) {		// accumulate char to number
+				convertedValue = convertedValue * 10 + (buffer[i] - '0');
 			}
 
-			if (currentIndex == 1) num*=-1;		// if negative, add "-" for number
+			convertedValue *= isNegative ? -1 : 1;	// add - if it is negative
 
-			if (num > MAX_INT || num < MIN_INT || index > MAX_LENGTH_INT) {		// if this number is outOfBound of int32 number
-				valid = false;
-				DEBUG(dbgSys, "Over size of integer");
+			if (currentLength > MAX_LENGTH_INT || convertedValue < MIN_INT || convertedValue > MAX_INT) {
+				convertedValue = 0;
+				// DEBUG(dbgSys, "Over size of integer");
+			} else {
+				DEBUG(dbgSys, "Result: " << convertedValue << "\n");		// print result
 			}
 
-			DEBUG(dbgSys, "Result: " << num << "\n");		// print result
-
-
-			kernel->machine->WriteRegister(2, num);
+			kernel->machine->WriteRegister(2, convertedValue);
 			IncrementPC();
 			delete buffer;
 			return;
