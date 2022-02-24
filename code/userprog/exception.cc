@@ -197,14 +197,15 @@ void ExceptionHandler(ExceptionType which)
 
 		case SC_PrintNum:
 		{
-			long long res = kernel->machine->ReadRegister(4);
+			long long res = kernel->machine->ReadRegister(4);		// input number
 
-			if (res == 0) {
+			if (res == 0) {		// handle adhoc case
 				kernel->synchConsoleOut->PutChar('0');
 				IncrementPC();
 				return;
 			}
 
+			// init phase
 			char * buffer = new char [12];
 
 			int currentIndex = 0;
@@ -212,11 +213,11 @@ void ExceptionHandler(ExceptionType which)
 			long long tmp = res;
 			int countDigit = 0;
 
-			while (tmp) {
+			while (tmp) {		// count number of digit
 				tmp /= 10;
 				countDigit++;
 			}
-			if (res < 0) {
+			if (res < 0) {		// add minus if it is negative number
 				buffer[countDigit] = '-';
 				tmp = -res;
 			}else{
@@ -224,12 +225,12 @@ void ExceptionHandler(ExceptionType which)
 				tmp = res;
 			}
 
-			while (tmp) {
+			while (tmp) {			// split each digit in num
 				buffer[currentIndex] = (char)((tmp % 10) + 48);
 				currentIndex++;
 				tmp/=10;
 			}
-			for (int i = countDigit; i >=0; i--) {
+			for (int i = countDigit; i >=0; i--) {		// print out
 				kernel->synchConsoleOut->PutChar(buffer[i]);
 			}
 
@@ -247,7 +248,7 @@ void ExceptionHandler(ExceptionType which)
 			int index = -1;
 
 			do {
-				input[++index] = kernel->synchConsoleIn->GetChar();
+				input[++index] = kernel->synchConsoleIn->GetChar();		// read until reach break line sign or reach limit szie
 			}
 			while (input[index] != '\n' && index <= MAX_BUFFER);
 
@@ -306,7 +307,7 @@ void ExceptionHandler(ExceptionType which)
 
 			while (tmp) {
 				buffer[index] = kernel->synchConsoleIn->GetChar();
-				if (buffer[index] == '\n') break;
+				if (buffer[index] == '\n') break;		// read until reach LineFeed
 				index++;
 				tmp--;
 			}
