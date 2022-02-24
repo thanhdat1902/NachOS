@@ -124,7 +124,7 @@ void ExceptionHandler(ExceptionType which)
 			ASSERTNOTREACHED();
 			break;
 		}
-			
+
 		case SC_Add:
 		{
 			DEBUG(dbgSys, "Add " << kernel->machine->ReadRegister(4) << " + " << kernel->machine->ReadRegister(5) << "\n");
@@ -148,11 +148,11 @@ void ExceptionHandler(ExceptionType which)
 		case SC_ReadNum:
 		{
 			int MAX_LENGTH_INT = 11;
-			char* buffer = new char [MAX_LENGTH_INT+1];	
+			char* buffer = new char [MAX_LENGTH_INT+1];
 			int currentLength = 0;
 
-			long long MAX_INT = 2147483647; 	// 2^31 - 1
-			long long MIN_INT = -2147483648;	// -2^31
+			int MAX_INT = 2147483647; 	// 2^31 - 1
+			int MIN_INT = -2147483648;	// -2^31
 
 			bool isNegative = false;
 
@@ -163,7 +163,7 @@ void ExceptionHandler(ExceptionType which)
 				bool isValidDigit = ('0' <= currentDigit && currentDigit <= '9');
 
 
-				if (isValidDigit || isValidMinus) { 
+				if (isValidDigit || isValidMinus) {
 					buffer[currentLength++] = currentDigit;
 				} else {
 					// break if there is invalid character (or '\n')
@@ -172,22 +172,22 @@ void ExceptionHandler(ExceptionType which)
 				isNegative = isNegative || isValidMinus;
 			}
 
-			
-			long long convertedValue = 0;	
+
+			long long convertedValue = 0;
 			for (int i = isNegative ? 1 : 0; i < currentLength; i++) {		// accumulate char to number
 				convertedValue = convertedValue * 10 + (buffer[i] - '0');
 			}
 
 			convertedValue *= isNegative ? -1 : 1;	// add - if it is negative
 
-			if (currentLength > MAX_LENGTH_INT || convertedValue < MIN_INT || convertedValue > MAX_INT) { 
-				DEBUG(dbgSys, "Over size of integer");
+			if (currentLength > MAX_LENGTH_INT || convertedValue < MIN_INT || convertedValue > MAX_INT) {
+				convertedValue = 0;
+				// DEBUG(dbgSys, "Over size of integer");
 			} else {
-				DEBUG(dbgSys, "Result: " << num << "\n");		// print result
+				DEBUG(dbgSys, "Result: " << convertedValue << "\n");		// print result
 			}
 
-
-			kernel->machine->WriteRegister(2, num);
+			kernel->machine->WriteRegister(2, convertedValue);
 			IncrementPC();
 			delete buffer;
 			return;
@@ -204,9 +204,9 @@ void ExceptionHandler(ExceptionType which)
 				IncrementPC();
 				return;
 			}
-			
+
 			char * buffer = new char [12];
-			
+
 			int currentIndex = 0;
 			
 			long long tmp = res;
@@ -223,16 +223,16 @@ void ExceptionHandler(ExceptionType which)
 				countDigit--;
 				tmp = res;
 			}
-			
+
 			while (tmp) {
-				buffer[currentIndex] = (char)((tmp % 10) + 48);	
+				buffer[currentIndex] = (char)((tmp % 10) + 48);
 				currentIndex++;
 				tmp/=10;
 			}
 			for (int i = countDigit; i >=0; i--) {
 				kernel->synchConsoleOut->PutChar(buffer[i]);
 			}
-			
+
 			delete buffer;
 			IncrementPC();
 			return;
@@ -247,7 +247,7 @@ void ExceptionHandler(ExceptionType which)
 			int index = -1;
 
 			do {
-				input[++index] = kernel->synchConsoleIn->GetChar();	
+				input[++index] = kernel->synchConsoleIn->GetChar();
 			}
 			while (input[index] != '\n' && index <= MAX_BUFFER);
 
@@ -286,7 +286,7 @@ void ExceptionHandler(ExceptionType which)
 			ltime = time(NULL);
 			stime = (unsigned) ltime/2;
 			srand(stime);
-			
+
 			kernel->machine->WriteRegister(2, rand());
 
 			IncrementPC();
@@ -310,9 +310,9 @@ void ExceptionHandler(ExceptionType which)
 				index++;
 				tmp--;
 			}
-			
+
 			System2User(addressBuffer, length, buffer);
-			
+
 			delete buffer;
 
 			IncrementPC();
