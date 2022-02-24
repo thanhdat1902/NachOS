@@ -197,7 +197,7 @@ void ExceptionHandler(ExceptionType which)
 
 		case SC_PrintNum:
 		{
-			int res = kernel->machine->ReadRegister(4);
+			long long res = kernel->machine->ReadRegister(4);
 
 			if (res == 0) {
 				kernel->synchConsoleOut->PutChar('0');
@@ -209,7 +209,7 @@ void ExceptionHandler(ExceptionType which)
 			
 			int currentIndex = 0;
 			
-			int tmp = res;
+			long long tmp = res;
 			int countDigit = 0;
 
 			while (tmp) {
